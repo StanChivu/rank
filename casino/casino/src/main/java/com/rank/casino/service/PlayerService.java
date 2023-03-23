@@ -30,7 +30,6 @@ public class PlayerService {
 
 
     // Get all Players
-
     public List<Player> findAllPlayers(){
         return playerRepo.findAll();
     }
@@ -39,7 +38,7 @@ public class PlayerService {
         return playerRepo.findPlayerBalanceByPlayerID(playerID);       
     }
 
-
+    // Update player
     public Player updatePlayerBalance(Player player) throws Exception {
         
         return playerRepo.save(player);
@@ -51,17 +50,16 @@ public class PlayerService {
         return transRepo.saveAndFlush(transaction);
     }
 
-    public List<Transaction> findTransactionByPlayerID(int playerID){
-        return null;
+    // find player by username
+    public Player findPlayerByUsername(String username) throws Exception{
+        
+        return playerRepo.findPlayerByUsername(username).orElseThrow(() -> new Exception("Player username not found"));
         
     }
 
-/**  
-    public ResponseEntity<?> findPlayerById(int playerId){
-        
-        //return playerRepo.findPlayerById(playerId).orElseThrow(() -> new UserNotFoundException(ResponseEntity<?>(HttpStatus.BAD_REQUEST) ) );
-        
+    // get a list of player transaction by playerID
+    public List<Transaction> findTransactionByPlayerId(int playerID) throws Exception{
+        return transRepo.findTransactionByPlayerID(playerID);
     }
-*/
 
 }

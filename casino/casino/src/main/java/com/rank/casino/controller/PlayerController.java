@@ -1,17 +1,9 @@
 package com.rank.casino.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-import org.hibernate.grammars.hql.HqlParser.IsEmptyPredicateContext;
-import org.springframework.http.HttpMessage;
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,8 +50,6 @@ public class PlayerController {
         // Get the player balance
         @GetMapping("player/{playerID}/balance")
         public ResponseEntity<List<Player>> findPlayerBalanceByPlayerId(@PathVariable("playerID") int playerID) throws Exception{
-            System.out.println("Player ID: " + playerID);
-
             try {
                 List<Player> playerBalance = playerService.findPlayerBalanceByPlayerId(playerID);
                 
@@ -72,7 +62,6 @@ public class PlayerController {
             } catch (Exception e) {
                 
                 return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
-                //return "returnBalance";
             }
             
         }
@@ -80,7 +69,6 @@ public class PlayerController {
         // Update player balance
         @PutMapping("/player/{playerid}/balance/update")
         public ResponseEntity<List<String>> updatePlayerBalance(@PathVariable("playerid") int playerID, @RequestBody Transaction transaction ) throws Exception{
-            
             
            try {
                 float currentAmount = 0.0f;
@@ -91,16 +79,12 @@ public class PlayerController {
 
                 TransactionType transactionType = transaction.getTransactionType();
                 
-                System.out.println("Amount: " + amount + " Transaction type: " + transactionType);
                 transaction.setPlayerID(playerID);
                 Transaction lastTransaction = new Transaction();
-                System.out.println("PlayerID: " + transaction.getPlayerID() );
 
                 // if the amount is negative (less than 0), show as HTTP Bad req
                 if( amount < 0 ){
-                    System.out.println("Amount is negative");
                     return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
-                    //throw new Exception("Amount must not be negative");
                 }
 
                 List<Player> player = playerService.findPlayerBalanceByPlayerId(playerID);
@@ -122,23 +106,15 @@ public class PlayerController {
                 {
                     // update the player balance.
                     player.get(0).setBalance( currentAmount - amount);
-                    float f = currentAmount - amount;
-                    System.out.println("New player balance should be: " + f);
 
                     // update player balance
                     playerService.updatePlayerBalance(player.get(0));
                     
                     // save new transaction
                     lastTransaction = playerService.newTransaction(transaction);
-                    //List<String> playerTransaction = new ArrayList<>();
 
                     playerTransaction.add("transactionId: " + lastTransaction.getTransactionId() );
                     playerTransaction.add("amount: " + player.get(0).getBalance() );
-
-                    System.out.print("Last transaction ID: " + lastTransaction.getTransactionId() );
-                    
-                    // save transaction list
-                    //List<Transaction> transactionStatus = new List<Transaction>();
 
                 }
 
@@ -150,16 +126,9 @@ public class PlayerController {
                     // save new transaction
                     lastTransaction = playerService.newTransaction(transaction);
                     
-
+                    // Add Transaction ID and amount in the array list
                     playerTransaction.add("transactionId: " + lastTransaction.getTransactionId() );
                     playerTransaction.add("amount: " + player.get(0).getBalance() );
-
-                    System.out.print("Last transaction ID: " + lastTransaction.getTransactionId() );
-
-                    // save transaction list
-                    //List<Transaction,Player> transactionStatus = new List<>(lastTransaction, player);
-                    //return new ResponseEntity<>( lastTransaction , HttpStatus.OK);
-                    //return new ResponseEntity<>( transactionStatus , HttpStatus.OK);
 
                 }
 
@@ -172,27 +141,24 @@ public class PlayerController {
 
         }
 
- /**  
-        // Get player
-        @GetMapping("/player/{playerId}")
-        public ResponseEntity<Player> getPlayerById(@PathVariable("playerId") int playerId ){
-            return playerService.findPlayerById(playerId);
-        }
+  
+        // Get player transaction history
+        @PostMapping("/admin/player/transactions")
+        public ResponseEntity<List<Transaction>> getTransactionByUsername( @RequestBody Player player ) throws Exception{
 
-/**
-        
-        // Get the player balance
-        @GetMapping("player/{playerID}/balance")
-        public Player getPlayerBalanceById(int playerId){
+            try {
+                // get Player details by username
+                Player p = playerService.findPlayerByUsername( player.getUsername() );
+
+                List<Transaction> t = playerService.findTransactionByPlayerId(p.getPlayerID());
+
+                //return array list of player transaction
+                return new ResponseEntity<>(t,HttpStatus.OK);                
+                
+            } catch (Exception e) {
+                return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+            }
             
         }
-    
-        // Update the player balance
-        @PostMapping("/player/{playerid}/balance/update")
-        public Player updateBalance(@RequestBody Player player, @RequestBody Transaction transaction){
-            
-        }
-
-    */
 
 }

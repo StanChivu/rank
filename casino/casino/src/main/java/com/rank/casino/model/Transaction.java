@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 @Entity
 public class Transaction{
     
-    public enum TransactionType{
+    public static enum TransactionType{
         WAGER,
         WIN;
     }
@@ -19,13 +19,13 @@ public class Transaction{
     @Column(nullable = false, updatable = false)
     private int transactionId;
     private float amount;
-    private static TransactionType transactionType;
+    private TransactionType transactionType;
     private int playerID;
 
     public Transaction(){
         this.transactionId = 0;
         this.amount = 0.0f;
-        Transaction.transactionType = null;
+        transactionType = null;
         this.playerID = 0;
     }
 
@@ -60,7 +60,7 @@ public class Transaction{
     }
 
     public void setTransactionType( TransactionType transactionType) throws Exception {
-            Transaction.transactionType = transactionType;
+            this.transactionType = transactionType;
     }
 
     public TransactionType getTransactionType(){

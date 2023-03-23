@@ -42,6 +42,10 @@ public class Player{
         setBalance(balance);
     }
 
+    public Player(String username) throws Exception{
+        setUsername(username);
+    }
+
     // Set Methods
 
     public void setPlayerID(int playerID) {
